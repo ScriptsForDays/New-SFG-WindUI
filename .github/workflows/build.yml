@@ -1,5 +1,9 @@
 name: Build WindUI (main)
 
+# Allow the workflow to push back to the repository using the provided token
+permissions:
+  contents: write
+
 on:
   push:
     branches: ["main"]
