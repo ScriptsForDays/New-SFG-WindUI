@@ -4,7 +4,7 @@
     | |/ |/ / / _ \/ _  / /_/ // /  
     |__/|__/_/_//_/\_,_/\____/___/
     
-    v1.6.64  |  2026-01-05  |  Roblox UI Library for scripts
+    v1.6.64  |  2026-01-10  |  Roblox UI Library for scripts
     
     To view the source code, see the `src/` folder on the official GitHub repository.
     
@@ -7242,6 +7242,114 @@ end
 ar:Refresh(an.Values)
 end
 
+
+function ar.AutoRefresh(at,au,...)
+if typeof(au)~="function"then
+warn"AutoRefresh: fetchFunction must be a function"
+return
+end
+
+local av={...}
+
+task.spawn(function()
+local aw,ax=pcall(function()
+return au(unpack(av))
+end)
+if aw and ax then
+
+if typeof(ax)=="table"then
+ar:Refresh(ax)
+else
+warn"AutoRefresh: fetchFunction must return a table/array of values"
+end
+else
+warn("AutoRefresh: Failed to fetch new values - "..tostring(ax))
+end
+end)
+end
+
+
+function ar.RefreshFromModule(at,au,av,...)
+if typeof(au)~="string"then
+warn"RefreshFromModule: modulePath must be a string"
+return
+end
+
+local aw,ax=pcall(require,au)
+if not aw then
+warn("RefreshFromModule: Failed to require module - "..tostring(ax))
+return
+end
+
+if av and typeof(ax[av])=="function"then
+ar:AutoRefresh(ax[av],...)
+elseif not av then
+
+if typeof(ax)=="table"then
+ar:Refresh(ax)
+else
+warn"RefreshFromModule: Module must return a table when no functionName is provided"
+end
+else
+warn("RefreshFromModule: Function '"..av.."' not found in module")
+end
+end
+
+
+function ar.RefreshFromGame(at,au,av,aw)
+if typeof(au)~="string"then
+warn"RefreshFromGame: path must be a string"
+return
+end
+
+local ax,ay=pcall(function()
+local ax=string.split(au,".")
+local ay=game
+for az,aA in ipairs(ax)do
+ay=ay[aA]
+if not ay then break end
+end
+return ay
+end)
+
+if not ax or not ay then
+warn("RefreshFromGame: Invalid path - "..au)
+return
+end
+
+if av and typeof(ay[av])=="function"then
+
+ar:AutoRefresh(ay[av])
+elseif av then
+
+local az=ay[av]
+if typeof(az)=="table"then
+ar:Refresh(az)
+else
+warn("RefreshFromGame: Property '"..av.."' must be a table or function")
+end
+else
+
+local az={}
+local aA=ay:GetChildren()
+
+if aw and typeof(aw)=="function"then
+aA={}
+for aB,b in ipairs(ay:GetChildren())do
+if aw(b)then
+table.insert(aA,b.Name)
+end
+end
+else
+for aB,b in ipairs(aA)do
+table.insert(az,b.Name)
+end
+end
+
+ar:Refresh(az)
+end
+end
+
 RecalculateListSize()
 RecalculateCanvasSize()
 
@@ -8891,6 +8999,106 @@ end
 
 
 ar:Destroy()
+end
+
+
+function al.RefreshElements(at,au,...)
+if typeof(au)~="function"then
+warn"RefreshElements: fetchFunction must be a function"
+return
+end
+
+local av={...}
+
+task.spawn(function()
+local aw,ax=pcall(function()
+return au(unpack(av))
+end)
+if aw and ax and typeof(ax)=="table"then
+
+for ay,az in next,al.Elements do
+az:Destroy()
+end
+al.Elements={}
+
+
+for ay,az in next,ax do
+if typeof(az)=="table"and az.Type then
+local aA=string.lower(az.Type)
+if as.Elements[aA]then
+local aB=as.Elements[aA]:New(az,ar.Content,ak.Window,ak.WindUI,as,ak.UIScale,ak.Tab)
+if aB then
+table.insert(al.Elements,aB)
+end
+end
+end
+end
+
+
+if al.Opened then
+al:Open()
+end
+else
+warn("RefreshElements: Failed to fetch new elements - "..tostring(ax))
+end
+end)
+end
+
+
+function al.RefreshFromModule(at,au,av,...)
+if typeof(au)~="string"then
+warn"RefreshFromModule: modulePath must be a string"
+return
+end
+
+local aw,ax=pcall(require,au)
+if not aw then
+warn("RefreshFromModule: Failed to require module - "..tostring(ax))
+return
+end
+
+if av and typeof(ax[av])=="function"then
+al:RefreshElements(ax[av],...)
+elseif not av then
+
+if typeof(ax)=="table"then
+al:RefreshElements(function()return ax end)
+else
+warn"RefreshFromModule: Module must return a table when no functionName is provided"
+end
+else
+warn("RefreshFromModule: Function '"..av.."' not found in module")
+end
+end
+
+
+function al.RefreshElementType(at,au,av,...)
+if typeof(av)~="function"then
+warn"RefreshElementType: fetchFunction must be a function"
+return
+end
+
+local aw={...}
+
+task.spawn(function()
+local ax,ay=pcall(function()
+return av(unpack(aw))
+end)
+if ax and ay then
+
+for az,aA in next,al.Elements do
+if aA.__type and string.lower(aA.__type)==string.lower(au)then
+if aA.Refresh then
+aA:Refresh(ay)
+elseif aA.AutoRefresh then
+aA:AutoRefresh(function()return ay end)
+end
+end
+end
+else
+warn("RefreshElementType: Failed to fetch new data - "..tostring(ay))
+end
+end)
 end
 
 function al.Open(at)
