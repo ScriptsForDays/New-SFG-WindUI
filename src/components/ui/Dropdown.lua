@@ -529,6 +529,114 @@ function DropdownMenu.New(Config, Dropdown, Element, CanCallback, Type)
         end
         DropdownModule:Refresh(Dropdown.Values)
     end
+
+    -- Auto-refresh functionality for dynamic data fetching
+    function DropdownModule:AutoRefresh(fetchFunction, ...)
+        if typeof(fetchFunction) ~= "function" then
+            warn("AutoRefresh: fetchFunction must be a function")
+            return
+        end
+
+        local args = {...}
+
+        task.spawn(function()
+            local success, newValues = pcall(function()
+                return fetchFunction(unpack(args))
+            end)
+            if success and newValues then
+                -- Validate that newValues is a table/array
+                if typeof(newValues) == "table" then
+                    DropdownModule:Refresh(newValues)
+                else
+                    warn("AutoRefresh: fetchFunction must return a table/array of values")
+                end
+            else
+                warn("AutoRefresh: Failed to fetch new values - " .. tostring(newValues))
+            end
+        end)
+    end
+
+    -- Auto-refresh from ModuleScript
+    function DropdownModule:RefreshFromModule(modulePath, functionName, ...)
+        if typeof(modulePath) ~= "string" then
+            warn("RefreshFromModule: modulePath must be a string")
+            return
+        end
+
+        local success, module = pcall(require, modulePath)
+        if not success then
+            warn("RefreshFromModule: Failed to require module - " .. tostring(module))
+            return
+        end
+
+        if functionName and typeof(module[functionName]) == "function" then
+            DropdownModule:AutoRefresh(module[functionName], ...)
+        elseif not functionName then
+            -- If no function name provided, assume module returns data directly
+            if typeof(module) == "table" then
+                DropdownModule:Refresh(module)
+            else
+                warn("RefreshFromModule: Module must return a table when no functionName is provided")
+            end
+        else
+            warn("RefreshFromModule: Function '" .. functionName .. "' not found in module")
+        end
+    end
+
+    -- Auto-refresh from game objects (e.g., workspace, replicatedstorage)
+    function DropdownModule:RefreshFromGame(path, property, filterFunction)
+        if typeof(path) ~= "string" then
+            warn("RefreshFromGame: path must be a string")
+            return
+        end
+
+        local success, object = pcall(function()
+            local parts = string.split(path, ".")
+            local current = game
+            for _, part in ipairs(parts) do
+                current = current[part]
+                if not current then break end
+            end
+            return current
+        end)
+
+        if not success or not object then
+            warn("RefreshFromGame: Invalid path - " .. path)
+            return
+        end
+
+        if property and typeof(object[property]) == "function" then
+            -- If property is a function, call it
+            DropdownModule:AutoRefresh(object[property])
+        elseif property then
+            -- If property exists, use its value
+            local value = object[property]
+            if typeof(value) == "table" then
+                DropdownModule:Refresh(value)
+            else
+                warn("RefreshFromGame: Property '" .. property .. "' must be a table or function")
+            end
+        else
+            -- If no property specified, get children or descendants
+            local items = {}
+            local getItems = object:GetChildren()
+
+            if filterFunction and typeof(filterFunction) == "function" then
+                getItems = {}
+                for _, child in ipairs(object:GetChildren()) do
+                    if filterFunction(child) then
+                        table.insert(getItems, child.Name)
+                    end
+                end
+            else
+                for _, child in ipairs(getItems) do
+                    table.insert(items, child.Name)
+                end
+            end
+
+            DropdownModule:Refresh(items)
+        end
+    end
     
     RecalculateListSize()
     RecalculateCanvasSize()

@@ -251,6 +251,106 @@ function Element:New(Config)
             Main:Destroy()
         end
 
+        -- Auto-refresh functionality for sections
+        function Section:RefreshElements(fetchFunction, ...)
+            if typeof(fetchFunction) ~= "function" then
+                warn("RefreshElements: fetchFunction must be a function")
+                return
+            end
+
+            local args = {...}
+
+            task.spawn(function()
+                local success, newElements = pcall(function()
+                    return fetchFunction(unpack(args))
+                end)
+                if success and newElements and typeof(newElements) == "table" then
+                    -- Clear existing elements
+                    for _, element in next, Section.Elements do
+                        element:Destroy()
+                    end
+                    Section.Elements = {}
+
+                    -- Add new elements
+                    for _, elementConfig in next, newElements do
+                        if typeof(elementConfig) == "table" and elementConfig.Type then
+                            local elementType = string.lower(elementConfig.Type)
+                            if ElementsModule.Elements[elementType] then
+                                local newElement = ElementsModule.Elements[elementType]:New(elementConfig, Main.Content, Config.Window, Config.WindUI, ElementsModule, Config.UIScale, Config.Tab)
+                                if newElement then
+                                    table.insert(Section.Elements, newElement)
+                                end
+                            end
+                        end
+                    end
+
+                    -- Update section layout
+                    if Section.Opened then
+                        Section:Open()
+                    end
+                else
+                    warn("RefreshElements: Failed to fetch new elements - " .. tostring(newElements))
+                end
+            end)
+        end
+
+        -- Refresh from ModuleScript
+        function Section:RefreshFromModule(modulePath, functionName, ...)
+            if typeof(modulePath) ~= "string" then
+                warn("RefreshFromModule: modulePath must be a string")
+                return
+            end
+
+            local success, module = pcall(require, modulePath)
+            if not success then
+                warn("RefreshFromModule: Failed to require module - " .. tostring(module))
+                return
+            end
+
+            if functionName and typeof(module[functionName]) == "function" then
+                Section:RefreshElements(module[functionName], ...)
+            elseif not functionName then
+                -- If no function name provided, assume module returns element configs directly
+                if typeof(module) == "table" then
+                    Section:RefreshElements(function() return module end)
+                else
+                    warn("RefreshFromModule: Module must return a table when no functionName is provided")
+                end
+            else
+                warn("RefreshFromModule: Function '" .. functionName .. "' not found in module")
+            end
+        end
+
+        -- Refresh specific element types within the section
+        function Section:RefreshElementType(elementType, fetchFunction, ...)
+            if typeof(fetchFunction) ~= "function" then
+                warn("RefreshElementType: fetchFunction must be a function")
+                return
+            end
+
+            local args = {...}
+
+            task.spawn(function()
+                local success, newData = pcall(function()
+                    return fetchFunction(unpack(args))
+                end)
+                if success and newData then
+                    -- Find elements of the specified type and refresh them
+                    for _, element in next, Section.Elements do
+                        if element.__type and string.lower(element.__type) == string.lower(elementType) then
+                            if element.Refresh then
+                                element:Refresh(newData)
+                            elseif element.AutoRefresh then
+                                element:AutoRefresh(function() return newData end)
+                            end
+                        end
+                    end
+                else
+                    warn("RefreshElementType: Failed to fetch new data - " .. tostring(newData))
+                end
+            end)
+        end
+
         function Section:Open()
             if Section.Expandable then
                 Section.Opened = true

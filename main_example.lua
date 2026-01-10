@@ -1166,6 +1166,209 @@ do -- config panel
 end
 
 
+-- */  Auto-Refresh Examples  /* --
+do
+    local RefreshSection = Window:Section({
+        Title = "Auto-Refresh Examples",
+        Icon = "refresh-cw",
+        Desc = "Demonstrates dynamic data fetching and refreshing"
+    })
+
+    local RefreshTab = RefreshSection:Tab({
+        Title = "Dynamic Data",
+        Border = true,
+    })
+
+    -- Example 1: Dropdown that refreshes from workspace children
+    local workspaceDropdown = RefreshTab:Dropdown({
+        Title = "Workspace Children",
+        Desc = "Automatically refreshes with current workspace children",
+        Values = {},
+        Multi = false,
+        Callback = function(value)
+            print("Selected workspace child:", value)
+        end
+    })
+
+    -- Refresh button for workspace dropdown
+    RefreshTab:Button({
+        Title = "Refresh Workspace Children",
+        Icon = "refresh-cw",
+        Callback = function()
+            workspaceDropdown:RefreshFromGame("Workspace", nil, function(child)
+                -- Filter to only show BaseParts and Models
+                return child:IsA("BasePart") or child:IsA("Model")
+            end)
+        end
+    })
+
+    RefreshTab:Space()
+
+    -- Example 2: Dropdown that refreshes from a custom function
+    local timeDropdown = RefreshTab:Dropdown({
+        Title = "Current Time Options",
+        Desc = "Refreshes with current time-based options",
+        Values = {},
+        Multi = false,
+    })
+
+    -- Custom fetch function for time-based options
+    local function getTimeOptions()
+        local currentHour = os.date("*t").hour
+        local options = {}
+
+        if currentHour < 12 then
+            table.insert(options, "Good Morning")
+            table.insert(options, "Breakfast Time")
+        elseif currentHour < 18 then
+            table.insert(options, "Good Afternoon")
+            table.insert(options, "Lunch Time")
+        else
+            table.insert(options, "Good Evening")
+            table.insert(options, "Dinner Time")
+        end
+
+        table.insert(options, "Current Time: " .. os.date("%H:%M:%S"))
+        return options
+    end
+
+    -- Refresh button for time dropdown
+    RefreshTab:Button({
+        Title = "Refresh Time Options",
+        Icon = "clock",
+        Callback = function()
+            timeDropdown:AutoRefresh(getTimeOptions)
+        end
+    })
+
+    RefreshTab:Space()
+
+    -- Example 3: Section that refreshes its elements
+    local dynamicSection = RefreshTab:Section({
+        Title = "Dynamic Elements",
+        Desc = "This section can refresh its contents"
+    })
+
+    -- Function to generate dynamic elements based on game state
+    local function getDynamicElements()
+        local elements = {}
+
+        -- Add a toggle based on lighting
+        table.insert(elements, {
+            Type = "Toggle",
+            Title = "Day/Night Mode",
+            Desc = "Based on current lighting time",
+            Value = game:GetService("Lighting").ClockTime > 12,
+            Callback = function(value)
+                print("Day/Night mode:", value)
+            end
+        })
+
+        -- Add a slider for workspace parts count
+        local partCount = 0
+        for _, obj in ipairs(workspace:GetDescendants()) do
+            if obj:IsA("BasePart") then
+                partCount = partCount + 1
+            end
+        end
+
+        table.insert(elements, {
+            Type = "Slider",
+            Title = "Workspace Parts",
+            Desc = "Current count of parts in workspace",
+            Value = partCount,
+            Min = 0,
+            Max = math.max(partCount * 2, 100),
+            Callback = function(value)
+                print("Parts slider:", value)
+            end
+        })
+
+        -- Add a paragraph with game info
+        table.insert(elements, {
+            Type = "Paragraph",
+            Title = "Game Statistics",
+            Desc = string.format("Place: %s\nPlayers: %d\nParts: %d",
+                game.PlaceId,
+                #game:GetService("Players"):GetPlayers(),
+                partCount)
+        })
+
+        return elements
+    end
+
+    -- Refresh button for dynamic section
+    RefreshTab:Button({
+        Title = "Refresh Dynamic Section",
+        Icon = "zap",
+        Callback = function()
+            dynamicSection:RefreshElements(getDynamicElements)
+        end
+    })
+
+    -- Example 4: Module-based refresh (simulated)
+    local moduleDropdown = RefreshTab:Dropdown({
+        Title = "Module Data",
+        Desc = "Refreshes from module data",
+        Values = {"Loading..."},
+        Multi = false,
+    })
+
+    -- Simulate module data
+    local mockModule = {
+        GetPlayerList = function()
+            local players = {}
+            for _, player in ipairs(game:GetService("Players"):GetPlayers()) do
+                table.insert(players, player.Name .. " (" .. player.DisplayName .. ")")
+            end
+            return players
+        end,
+
+        GetServerStats = function()
+            return {
+                "Server FPS: " .. tostring(math.floor(workspace:GetRealPhysicsFPS())),
+                "Players Online: " .. tostring(#game:GetService("Players"):GetPlayers()),
+                "Place ID: " .. tostring(game.PlaceId),
+                "Job ID: " .. tostring(game.JobId)
+            }
+        end
+    }
+
+    RefreshTab:Button({
+        Title = "Load Player List",
+        Icon = "users",
+        Callback = function()
+            -- This would normally be: moduleDropdown:RefreshFromModule("path.to.module", "GetPlayerList")
+            -- For demo purposes, we'll use the mock module
+            moduleDropdown:AutoRefresh(mockModule.GetPlayerList)
+        end
+    })
+
+    RefreshTab:Button({
+        Title = "Load Server Stats",
+        Icon = "server",
+        Callback = function()
+            -- This would normally be: moduleDropdown:RefreshFromModule("path.to.module", "GetServerStats")
+            moduleDropdown:AutoRefresh(mockModule.GetServerStats)
+        end
+    })
+
+    RefreshTab:Space()
+
+    -- Info paragraph
+    RefreshTab:Paragraph({
+        Title = "How to Use Auto-Refresh",
+        Desc = [[
+Dropdown.AutoRefresh(fetchFunction, ...): Refresh dropdown with custom function
+Dropdown.RefreshFromModule(modulePath, functionName, ...): Refresh from ModuleScript
+Dropdown.RefreshFromGame(path, property, filterFunction): Refresh from game objects
+
+Section.RefreshElements(fetchFunction, ...): Refresh all section elements
+Section.RefreshFromModule(modulePath, functionName, ...): Refresh section from module
+Section.RefreshElementType(elementType, fetchFunction, ...): Refresh specific element types
+        ]]
+    })
+end
 
 
 -- */  Other  /* --
