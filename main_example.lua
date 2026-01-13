@@ -1435,7 +1435,7 @@ end
 
 -- */  Other  /* --
 do
-    local InviteCode = "ftgs-development-hub-1300692552005189632"
+    local InviteCode = "77AYzh3rKb"
     local DiscordAPI = "https://discord.com/api/v10/invites/" .. InviteCode .. "?with_counts=true&with_expiration=true"
 
     local Response = WindUI.cloneref(game:GetService("HttpService")):JSONDecode(WindUI.Creator.Request({
@@ -1454,14 +1454,14 @@ do
     
     if Response and Response.guild then
         DiscordTab:Section({
-            Title = "Join our Discord server!",
+            Title = "Join .sfgs Discord server!",
             TextSize = 20,
         })
         local DiscordServerParagraph = DiscordTab:Paragraph({
             Title = tostring(Response.guild.name),
             Desc = tostring(Response.guild.description),
             Image = "https://cdn.discordapp.com/icons/" .. Response.guild.id .. "/" .. Response.guild.icon .. ".png?size=1024",
-            Thumbnail = "https://cdn.discordapp.com/banners/1300692552005189632/35981388401406a4b7dffd6f447a64c4.png?size=512",
+            Thumbnail = Response.guild.banner and ("https://cdn.discordapp.com/banners/" .. Response.guild.id .. "/" .. Response.guild.banner .. ".png?size=512") or nil,
             ImageSize = 48,
             Buttons = {
                 {
