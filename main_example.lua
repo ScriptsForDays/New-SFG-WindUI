@@ -63,7 +63,7 @@ end
 
 -- */  Window  /* --
 local Window = WindUI:CreateWindow({
-    Title = ".ftgs hub  |  WindUI Example",
+    Title = ".sfgs hub | WindUI Example",
     --Author = "by .ftgs • Footagesus",
     Folder = "sfgshub",
     Icon = "solar:folder-2-bold-duotone",
@@ -324,7 +324,7 @@ do
     
     AboutSection:Section({
         Title = [[WindUI is a stylish, open-source UI (User Interface) library specifically designed for Roblox Script Hubs.
-Developed by Footagesus (.ftgs, Footages).
+Developed by .sfgs.
 It aims to provide developers with a modern, customizable, and easy-to-use toolkit for creating visually appealing interfaces within Roblox.
 The project is primarily written in Lua (Luau), the scripting language used in Roblox.]],
         TextSize = 18,
