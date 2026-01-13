@@ -3574,42 +3574,44 @@ al,
 })
 
 
-am._TextLabel=al
-am._IconLabelFrame=ak
+local an={
+TextLabel=al,
+IconLabelFrame=ak,
+}
 
 
-function am.Set(an,ao)
-local ap=an._TextLabel
-local aq=an._IconLabelFrame
+function am.Set(ao,ap)
+local aq=an.TextLabel
+local ar=an.IconLabelFrame
 
-if typeof(ao)~="table"then
+if typeof(ap)~="table"then
 
-if typeof(ao)=="string"then
-ap.Text=ao
+if typeof(ap)=="string"then
+aq.Text=ap
 return
 end
 warn"Label:Set() expects a table with Text or Icon properties, or a string for text"
 return
 end
 
-if ao.Text~=nil then
-ap.Text=ao.Text
+if ap.Text~=nil then
+aq.Text=ap.Text
 end
 
-if ao.Icon~=nil then
+if ap.Icon~=nil then
 
-if aq then
-aq:Destroy()
-aq=nil
-an._IconLabelFrame=nil
+if ar then
+ar:Destroy()
+ar=nil
+an.IconLabelFrame=nil
 end
 
 
-if ao.Icon~=""then
-aq=ac("ImageLabel",{
-Image=ab.Icon(ao.Icon)[1],
-ImageRectSize=ab.Icon(ao.Icon)[2].ImageRectSize,
-ImageRectOffset=ab.Icon(ao.Icon)[2].ImageRectPosition,
+if ap.Icon~=""then
+ar=ac("ImageLabel",{
+Image=ab.Icon(ap.Icon)[1],
+ImageRectSize=ab.Icon(ap.Icon)[2].ImageRectSize,
+ImageRectOffset=ab.Icon(ap.Icon)[2].ImageRectPosition,
 Size=UDim2.new(0,21,0,21),
 BackgroundTransparency=1,
 ThemeTag={
@@ -3618,14 +3620,14 @@ ImageColor3="Icon",
 })
 
 
-ap.Size=UDim2.new(1,-29,1,0)
+aq.Size=UDim2.new(1,-29,1,0)
 
 
-aq.Parent=an.Frame.Frame
-an._IconLabelFrame=aq
+ar.Parent=am.Frame.Frame
+an.IconLabelFrame=ar
 else
 
-ap.Size=UDim2.new(1,0,1,0)
+aq.Size=UDim2.new(1,0,1,0)
 end
 end
 end
