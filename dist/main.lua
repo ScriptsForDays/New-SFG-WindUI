@@ -787,7 +787,7 @@ Colors={
 }.IconFrame
 J.Parent=H
 elseif string.find(v,"http")then
-local J="WindUI/"..A.."/assets/."..B.."-"..x..".png"
+local J="SFGUI/"..A.."/assets/."..B.."-"..x..".png"
 local L,M=pcall(function()
 task.spawn(function()
 local L=p.Request{
@@ -4025,12 +4025,12 @@ end
 
 ac=af
 ad.Folder=ac.Folder
-ad.Path="WindUI/"..tostring(ad.Folder).."/config/"
+ad.Path="SFGUI/"..tostring(ad.Folder).."/config/"
 
-if not isfolder("WindUI/"..ad.Folder)then
-makefolder("WindUI/"..ad.Folder)
-if not isfolder("WindUI/"..ad.Folder.."/config/")then
-makefolder("WindUI/"..ad.Folder.."/config/")
+if not isfolder("SFGUI/"..ad.Folder)then
+makefolder("SFGUI/"..ad.Folder)
+if not isfolder("SFGUI/"..ad.Folder.."/config/")then
+makefolder("SFGUI/"..ad.Folder.."/config/")
 end
 end
 
@@ -11146,11 +11146,11 @@ at.Topbar={Height=52,ButtonsType="Default"}
 end
 
 if at.Folder then
-if not isfolder("WindUI/"..at.Folder)then
-makefolder("WindUI/"..at.Folder)
+if not isfolder("SFGUI/"..at.Folder)then
+makefolder("SFGUI/"..at.Folder)
 end
-if not isfolder("WindUI/"..at.Folder.."/assets")then
-makefolder("WindUI/"..at.Folder.."/assets")
+if not isfolder("SFGUI/"..at.Folder.."/assets")then
+makefolder("SFGUI/"..at.Folder.."/assets")
 end
 if not isfolder(at.Folder)then
 makefolder(at.Folder)
@@ -13204,8 +13204,8 @@ aa:SetLanguage(ao.Language)
 function aa.CreateWindow(aw,ax)
 local ay=a.load'Z'
 
-if not isfolder"WindUI"then
-makefolder"WindUI"
+if not isfolder"SFGUI"then
+makefolder"SFGUI"
 end
 if ax.Folder then
 makefolder(ax.Folder)
