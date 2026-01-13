@@ -321,10 +321,25 @@ function DropdownMenu.New(Config, Dropdown, Element, CanCallback, Type)
         local valuesArray = Values
         if typeof(Values) ~= "table" then
             valuesArray = {}
+            warn("Dropdown:Refresh() - Values must be a table, got: " .. typeof(Values))
         end
         
+        -- Ensure ScrollingFrame exists and is ready
+        if not Dropdown.UIElements.Menu or not Dropdown.UIElements.Menu.Frame or not Dropdown.UIElements.Menu.Frame.ScrollingFrame then
+            warn("Dropdown:Refresh() - ScrollingFrame not found!")
+            return
+        end
+        
+        -- Ensure ScrollingFrame is visible
+        Dropdown.UIElements.Menu.Frame.ScrollingFrame.Visible = true
+        
         for Index, Tab in ipairs(valuesArray) do
-            if (Tab.Type ~= "Divider") then
+            -- Check if Tab is a divider (only tables can have Type property)
+            local isDivider = typeof(Tab) == "table" and Tab.Type == "Divider"
+            
+            if isDivider then
+                require("../../elements/Divider"):New({ Parent = Dropdown.UIElements.Menu.Frame.ScrollingFrame })
+            else
                 local TabMain = {
                     Name = typeof(Tab) == "table" and Tab.Title or Tab,
                     Desc = typeof(Tab) == "table" and Tab.Desc or nil,
@@ -356,6 +371,7 @@ function DropdownMenu.New(Config, Dropdown, Element, CanCallback, Type)
                     Parent = Dropdown.UIElements.Menu.Frame.ScrollingFrame,
                     ImageColor3 = Color3.new(1,1,1),
                     Active = not TabMain.Locked,
+                    Visible = true,
                 }, {
                     Creator.NewRoundFrame(Element.MenuCorner - Element.MenuPadding, "Glass-1.4", {
                         Size = UDim2.new(1,0,1,0),
@@ -558,8 +574,6 @@ function DropdownMenu.New(Config, Dropdown, Element, CanCallback, Type)
                         Callback(Tab.Callback or function() end)
                     end)
                 end
-            else
-                require("../../elements/Divider"):New({ Parent = Dropdown.UIElements.Menu.Frame.ScrollingFrame })
             end
         end
         
