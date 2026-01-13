@@ -93,65 +93,6 @@ function Label.New(Text, Icon, Parent, IsPlaceholder, Radius)
         })
     })
     
-    -- Store references in closure (Roblox instances don't support arbitrary properties)
-    local labelData = {
-        TextLabel = TextLabel,
-        IconLabelFrame = IconLabelFrame,
-    }
-    
-    -- Add Set method for dynamic updates
-    function LabelFrame:Set(options)
-        local textLabel = labelData.TextLabel
-        local iconLabelFrame = labelData.IconLabelFrame
-        
-        if typeof(options) ~= "table" then
-            -- If options is a string, treat it as text
-            if typeof(options) == "string" then
-                textLabel.Text = options
-                return
-            end
-            warn("Label:Set() expects a table with Text or Icon properties, or a string for text")
-            return
-        end
-        
-        if options.Text ~= nil then
-            textLabel.Text = options.Text
-        end
-        
-        if options.Icon ~= nil then
-            -- Destroy old icon if it exists
-            if iconLabelFrame then
-                iconLabelFrame:Destroy()
-                iconLabelFrame = nil
-                labelData.IconLabelFrame = nil
-            end
-            
-            -- Create new icon if provided
-            if options.Icon ~= "" then
-                iconLabelFrame = New("ImageLabel", {
-                    Image = Creator.Icon(options.Icon)[1],
-                    ImageRectSize = Creator.Icon(options.Icon)[2].ImageRectSize,
-                    ImageRectOffset = Creator.Icon(options.Icon)[2].ImageRectPosition,
-                    Size = UDim2.new(0,24-3,0,24-3),
-                    BackgroundTransparency = 1,
-                    ThemeTag = {
-                        ImageColor3 = "Icon",
-                    }
-                })
-                
-                -- Update TextLabel size to account for icon
-                textLabel.Size = UDim2.new(1, -29, 1, 0)
-                
-                -- Insert icon into the frame (before TextLabel)
-                iconLabelFrame.Parent = LabelFrame.Frame.Frame
-                labelData.IconLabelFrame = iconLabelFrame
-            else
-                -- No icon, update TextLabel size
-                textLabel.Size = UDim2.new(1, 0, 1, 0)
-            end
-        end
-    end
-    
     return LabelFrame
 end
 
