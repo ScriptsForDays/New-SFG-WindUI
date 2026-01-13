@@ -116,11 +116,11 @@ return function(Config)
     end
     
     if Window.Folder then
-        if not isfolder("WindUI/" .. Window.Folder) then
-            makefolder("WindUI/" .. Window.Folder)
+        if not isfolder("SFGUI/" .. Window.Folder) then
+            makefolder("SFGUI/" .. Window.Folder)
         end
-        if not isfolder("WindUI/" .. Window.Folder .. "/assets") then
-            makefolder("WindUI/" .. Window.Folder .. "/assets")
+        if not isfolder("SFGUI/" .. Window.Folder .. "/assets") then
+            makefolder("SFGUI/" .. Window.Folder .. "/assets")
         end
         if not isfolder(Window.Folder) then
             makefolder(Window.Folder)

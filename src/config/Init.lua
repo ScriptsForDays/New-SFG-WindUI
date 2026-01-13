@@ -101,12 +101,12 @@ function ConfigManager:Init(WindowTable)
     
     Window = WindowTable
     ConfigManager.Folder = Window.Folder
-    ConfigManager.Path = "WindUI/" .. tostring(ConfigManager.Folder) .. "/config/"
+    ConfigManager.Path = "SFGUI/" .. tostring(ConfigManager.Folder) .. "/config/"
     
-    if not isfolder("WindUI/" .. ConfigManager.Folder) then
-        makefolder("WindUI/" .. ConfigManager.Folder)
-        if not isfolder("WindUI/" .. ConfigManager.Folder .. "/config/") then
-            makefolder("WindUI/" .. ConfigManager.Folder .. "/config/")
+    if not isfolder("SFGUI/" .. ConfigManager.Folder) then
+        makefolder("SFGUI/" .. ConfigManager.Folder)
+        if not isfolder("SFGUI/" .. ConfigManager.Folder .. "/config/") then
+            makefolder("SFGUI/" .. ConfigManager.Folder .. "/config/")
         end
     end
     
