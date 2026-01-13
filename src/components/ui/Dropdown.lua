@@ -228,10 +228,21 @@ function DropdownMenu.New(Config, Dropdown, Element, CanCallback, Type)
     end
     
     function DropdownModule:Refresh(Values)
+        -- Clear existing tabs but preserve UIListLayout
         for _, Elementt in next, Dropdown.UIElements.Menu.Frame.ScrollingFrame:GetChildren() do
             if not Elementt:IsA("UIListLayout") then
                 Elementt:Destroy()
             end
+        end
+        
+        -- Ensure UIListLayout still exists
+        if not Dropdown.UIElements.UIListLayout or not Dropdown.UIElements.UIListLayout.Parent then
+            Dropdown.UIElements.UIListLayout = New("UIListLayout", {
+                Padding = UDim.new(0,Element.MenuPadding/1.5),
+                FillDirection = "Vertical",
+                HorizontalAlignment = "Center",
+                Parent = Dropdown.UIElements.Menu.Frame.ScrollingFrame,
+            })
         end
         
         Dropdown.Tabs = {}
@@ -490,18 +501,23 @@ function DropdownMenu.New(Config, Dropdown, Element, CanCallback, Type)
                         Callback(Tab.Callback or function() end)
                     end)
                 end
-                
-                RecalculateCanvasSize()
-                RecalculateListSize()
             else
                 require("../../elements/Divider"):New({ Parent = Dropdown.UIElements.Menu.Frame.ScrollingFrame })
             end
         end
+        
+        -- Recalculate sizes after all items are added
+        -- Use RunService to wait for UI to update
+        local RunService = cloneref(game:GetService("RunService"))
+        RunService.Heartbeat:Wait()
+        
+        RecalculateCanvasSize()
+        RecalculateListSize()
             
         local maxWidth = Dropdown.MenuWidth or 0
         if maxWidth == 0 then
             for _, tabmain in next, Dropdown.Tabs do
-                if tabmain.UIElements.TabItem.Frame.UIListLayout then
+                if tabmain.UIElements and tabmain.UIElements.TabItem and tabmain.UIElements.TabItem.Frame and tabmain.UIElements.TabItem.Frame.UIListLayout then
                     maxWidth = math.max(maxWidth, tabmain.UIElements.TabItem.Frame.UIListLayout.AbsoluteContentSize.X)
                 end
             end
@@ -546,6 +562,10 @@ function DropdownMenu.New(Config, Dropdown, Element, CanCallback, Type)
         
         -- Update display after refresh
         DropdownModule:Display()
+        
+        -- Recalculate sizes again after display update
+        RecalculateCanvasSize()
+        RecalculateListSize()
         
         Callback()
     end
