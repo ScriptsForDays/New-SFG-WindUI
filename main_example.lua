@@ -1459,7 +1459,7 @@ do
         })
         local DiscordServerParagraph = DiscordTab:Paragraph({
             Title = tostring(Response.guild.name),
-            Desc = tostring(Response.guild.description),
+            Desc = Response.guild.description and tostring(Response.guild.description) or "Join the .sfgs Discord server!",
             Image = "https://cdn.discordapp.com/icons/" .. Response.guild.id .. "/" .. Response.guild.icon .. ".png?size=1024",
             Thumbnail = Response.guild.banner and ("https://cdn.discordapp.com/banners/" .. Response.guild.id .. "/" .. Response.guild.banner .. ".png?size=512") or nil,
             ImageSize = 48,
