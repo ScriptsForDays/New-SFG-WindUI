@@ -4,7 +4,7 @@
     | |/ |/ / / _ \/ _  / /_/ // /  
     |__/|__/_/_//_/\_,_/\____/___/
     
-    v1.6.64  |  2026-01-10  |  Roblox UI Library for scripts
+    v1.6.64  |  2026-01-13  |  Roblox UI Library for scripts
     
     To view the source code, see the `src/` folder on the official GitHub repository.
     
@@ -3573,6 +3573,63 @@ al,
 })
 })
 
+
+am._TextLabel=al
+am._IconLabelFrame=ak
+
+
+function am.Set(an,ao)
+local ap=an._TextLabel
+local aq=an._IconLabelFrame
+
+if typeof(ao)~="table"then
+
+if typeof(ao)=="string"then
+ap.Text=ao
+return
+end
+warn"Label:Set() expects a table with Text or Icon properties, or a string for text"
+return
+end
+
+if ao.Text~=nil then
+ap.Text=ao.Text
+end
+
+if ao.Icon~=nil then
+
+if aq then
+aq:Destroy()
+aq=nil
+an._IconLabelFrame=nil
+end
+
+
+if ao.Icon~=""then
+aq=ac("ImageLabel",{
+Image=ab.Icon(ao.Icon)[1],
+ImageRectSize=ab.Icon(ao.Icon)[2].ImageRectSize,
+ImageRectOffset=ab.Icon(ao.Icon)[2].ImageRectPosition,
+Size=UDim2.new(0,21,0,21),
+BackgroundTransparency=1,
+ThemeTag={
+ImageColor3="Icon",
+}
+})
+
+
+ap.Size=UDim2.new(1,-29,1,0)
+
+
+aq.Parent=an.Frame.Frame
+an._IconLabelFrame=aq
+else
+
+ap.Size=UDim2.new(1,0,1,0)
+end
+end
+end
+
 return am
 end
 
@@ -5479,6 +5536,23 @@ al.Size=UDim2.new(1,0,0,38)
 end
 end
 
+function ag.Set(ai,aj)
+if typeof(aj)~="table"then
+warn"Paragraph:Set() expects a table with Title or Desc properties"
+return
+end
+
+if aj.Title~=nil then
+ag.Title=aj.Title
+ah:SetTitle(aj.Title)
+end
+
+if aj.Desc~=nil then
+ag.Desc=aj.Desc
+ah:SetDesc(aj.Desc)
+end
+end
+
 return ag.__type,ag
 
 end
@@ -5502,7 +5576,8 @@ IconAlign=ae.IconAlign or"Right",
 Locked=ae.Locked or false,
 LockedTitle=ae.LockedTitle,
 Callback=ae.Callback or function()end,
-UIElements={}
+UIElements={},
+Window=ae.Window,
 }
 
 local ag=true
@@ -5580,6 +5655,56 @@ aa.SafeCallback(af.Callback)
 end)
 end
 end)
+
+function af.Set(ah,ai)
+if typeof(ai)~="table"then
+warn"Button:Set() expects a table with Title, Icon, Desc, or Callback properties"
+return
+end
+
+if ai.Title~=nil then
+af.Title=ai.Title
+af.ButtonFrame:SetTitle(ai.Title)
+end
+
+if ai.Desc~=nil then
+af.Desc=ai.Desc
+af.ButtonFrame:SetDesc(ai.Desc)
+end
+
+if ai.Icon~=nil then
+af.Icon=ai.Icon
+
+
+if af.UIElements.ButtonIcon then
+af.UIElements.ButtonIcon:Destroy()
+end
+
+
+af.UIElements.ButtonIcon=aa.Image(
+af.Icon,
+af.Icon,
+0,
+af.Window.Folder,
+"Button",
+not af.Color and true or nil,
+af.IconThemed
+)
+
+af.UIElements.ButtonIcon.Size=UDim2.new(0,20,0,20)
+af.UIElements.ButtonIcon.Parent=af.Justify=="Between"and af.ButtonFrame.UIElements.Main or af.ButtonFrame.UIElements.Container.TitleFrame
+af.UIElements.ButtonIcon.LayoutOrder=af.IconAlign=="Left"and-99999 or 99999
+af.UIElements.ButtonIcon.AnchorPoint=Vector2.new(1,0.5)
+af.UIElements.ButtonIcon.Position=UDim2.new(1,0,0.5,0)
+
+af.ButtonFrame:Colorize(af.UIElements.ButtonIcon.ImageLabel,"ImageColor3")
+end
+
+if ai.Callback~=nil then
+af.Callback=ai.Callback
+end
+end
+
 return af.__type,af
 end
 
@@ -7543,6 +7668,43 @@ ao.Refresh=ao.DropdownMenu.Refresh
 ao.Select=ao.DropdownMenu.Select
 ao.Open=ao.DropdownMenu.Open
 ao.Close=ao.DropdownMenu.Close
+
+function ao.Set(aq,ar)
+if typeof(ar)~="table"then
+warn"Dropdown:Set() expects a table with Title, Desc, Value, or Values properties"
+return
+end
+
+if ar.Title~=nil then
+ao.Title=ar.Title
+ao.DropdownFrame:SetTitle(ar.Title)
+end
+
+if ar.Desc~=nil then
+ao.Desc=ar.Desc
+ao.DropdownFrame:SetDesc(ar.Desc)
+end
+
+if ar.Values~=nil then
+ao.Values=ar.Values
+ao.Refresh(ar.Values)
+end
+
+if ar.Value~=nil then
+ao:SetValue(ar.Value)
+end
+end
+
+function ao.SetValue(aq,ar)
+ao.Value=ar
+if ao.Multi and not ao.Value then
+ao.Value={}
+end
+if ao.Values and typeof(ao.Value)=="number"then
+ao.Value=ao.Values[ao.Value]
+end
+ao.Display()
+end
 
 af("ImageLabel",{
 Image=ae.Icon"chevrons-up-down"[1],
