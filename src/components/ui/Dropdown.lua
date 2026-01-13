@@ -229,14 +229,19 @@ function DropdownMenu.New(Config, Dropdown, Element, CanCallback, Type)
     
     function DropdownModule:Refresh(Values)
         -- Clear existing tabs but preserve UIListLayout
+        local preservedUIListLayout = nil
         for _, Elementt in next, Dropdown.UIElements.Menu.Frame.ScrollingFrame:GetChildren() do
-            if not Elementt:IsA("UIListLayout") then
+            if Elementt:IsA("UIListLayout") then
+                preservedUIListLayout = Elementt
+            else
                 Elementt:Destroy()
             end
         end
         
-        -- Ensure UIListLayout still exists
-        if not Dropdown.UIElements.UIListLayout or not Dropdown.UIElements.UIListLayout.Parent then
+        -- Ensure UIListLayout reference is correct
+        if preservedUIListLayout then
+            Dropdown.UIElements.UIListLayout = preservedUIListLayout
+        elseif not Dropdown.UIElements.UIListLayout or not Dropdown.UIElements.UIListLayout.Parent then
             Dropdown.UIElements.UIListLayout = New("UIListLayout", {
                 Padding = UDim.new(0,Element.MenuPadding/1.5),
                 FillDirection = "Vertical",
