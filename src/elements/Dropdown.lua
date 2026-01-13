@@ -116,6 +116,22 @@ function Element:New(Config)
         end
         
         if options.Values ~= nil then
+            -- Validate values before updating
+            if typeof(options.Values) ~= "table" then
+                warn("Dropdown:Set() - Values must be a table, got: " .. typeof(options.Values))
+                return
+            end
+            -- Check if table has any items (more robust than #Values)
+            local hasItems = false
+            for _ in ipairs(options.Values) do
+                hasItems = true
+                break
+            end
+            
+            if not hasItems then
+                warn("Dropdown:Set() - Values table is empty (no items found)")
+                return
+            end
             Dropdown.Values = options.Values
             Dropdown.Refresh(options.Values)
         end

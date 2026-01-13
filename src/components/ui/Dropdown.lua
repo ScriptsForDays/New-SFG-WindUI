@@ -274,6 +274,29 @@ function DropdownMenu.New(Config, Dropdown, Element, CanCallback, Type)
     end
     
     function DropdownModule:Refresh(Values)
+        -- Use Dropdown.Values as fallback if Values parameter is nil
+        if Values == nil then
+            Values = Dropdown.Values
+        end
+        
+        -- Validate Values is a table and not empty
+        if typeof(Values) ~= "table" then
+            warn("Dropdown:Refresh() - Values must be a table, got: " .. typeof(Values) .. ". Keeping existing tabs.")
+            return
+        end
+        
+        -- Check if table has any items (more robust than #Values)
+        local hasItems = false
+        for _ in ipairs(Values) do
+            hasItems = true
+            break
+        end
+        
+        if not hasItems then
+            warn("Dropdown:Refresh() - Values table is empty (no items found). Keeping existing tabs.")
+            return
+        end
+        
         -- Clear existing tabs but preserve UIListLayout
         local preservedUIListLayout = nil
         for _, Elementt in next, Dropdown.UIElements.Menu.Frame.ScrollingFrame:GetChildren() do
@@ -319,10 +342,6 @@ function DropdownMenu.New(Config, Dropdown, Element, CanCallback, Type)
         
         -- Use ipairs for array iteration to ensure proper order
         local valuesArray = Values
-        if typeof(Values) ~= "table" then
-            valuesArray = {}
-            warn("Dropdown:Refresh() - Values must be a table, got: " .. typeof(Values))
-        end
         
         -- Ensure ScrollingFrame exists and is ready
         if not Dropdown.UIElements.Menu or not Dropdown.UIElements.Menu.Frame or not Dropdown.UIElements.Menu.Frame.ScrollingFrame then
