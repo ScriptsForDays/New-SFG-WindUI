@@ -65,7 +65,7 @@ end
 local Window = WindUI:CreateWindow({
     Title = ".ftgs hub  |  WindUI Example",
     --Author = "by .ftgs • Footagesus",
-    Folder = "ftgshub",
+    Folder = "sfgshub",
     Icon = "solar:folder-2-bold-duotone",
     --IconSize = 22*2,
     NewElements = true,
