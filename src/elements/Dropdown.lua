@@ -97,6 +97,7 @@ function Element:New(Config)
     Dropdown.Select = Dropdown.DropdownMenu.Select
     Dropdown.Open = Dropdown.DropdownMenu.Open
     Dropdown.Close = Dropdown.DropdownMenu.Close
+    Dropdown.UpdateSelection = Dropdown.DropdownMenu.UpdateSelection
     
     function Dropdown:Set(options)
         if typeof(options) ~= "table" then
@@ -132,6 +133,8 @@ function Element:New(Config)
         if Dropdown.Values and typeof(Dropdown.Value) == "number" then
             Dropdown.Value = Dropdown.Values[Dropdown.Value]
         end
+        -- Update both visual selection state and display text
+        Dropdown.UpdateSelection()
         Dropdown.Display()
     end
     

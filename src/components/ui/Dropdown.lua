@@ -165,6 +165,52 @@ function DropdownMenu.New(Config, Dropdown, Element, CanCallback, Type)
         end
     end
     
+    function DropdownModule:UpdateSelection()
+        -- Update visual selection state of all tabs based on current Dropdown.Value
+        if not Dropdown.Tabs then return end
+        
+        for _, tab in next, Dropdown.Tabs do
+            if tab and tab.UIElements and tab.UIElements.TabItem then
+                local shouldBeSelected = false
+                
+                if Dropdown.Multi then
+                    if typeof(Dropdown.Value) == "table" then
+                        for _, item in ipairs(Dropdown.Value) do
+                            local itemName = typeof(item) == "table" and item.Title or item
+                            if itemName == tab.Name then
+                                shouldBeSelected = true
+                                break
+                            end
+                        end
+                    end
+                else
+                    local currentValue = typeof(Dropdown.Value) == "table" and Dropdown.Value.Title or Dropdown.Value
+                    shouldBeSelected = (currentValue == tab.Name)
+                end
+                
+                tab.Selected = shouldBeSelected
+                
+                -- Update visual state
+                if shouldBeSelected and not tab.Locked then
+                    Tween(tab.UIElements.TabItem, 0.1, {ImageTransparency = .95}):Play()
+                    Tween(tab.UIElements.TabItem.Highlight, 0.1, {ImageTransparency = .75}):Play()
+                    Tween(tab.UIElements.TabItem.Frame.Title.TextLabel, 0.1, {TextTransparency = 0}):Play()
+                    if tab.UIElements.TabIcon then
+                        Tween(tab.UIElements.TabIcon.ImageLabel, 0.1, {ImageTransparency = 0}):Play()
+                    end
+                else
+                    Tween(tab.UIElements.TabItem, 0.1, {ImageTransparency = 1}):Play()
+                    Tween(tab.UIElements.TabItem.Highlight, 0.1, {ImageTransparency = 1}):Play()
+                    local isDropdown = (Dropdown.Callback ~= nil)
+                    Tween(tab.UIElements.TabItem.Frame.Title.TextLabel, 0.1, {TextTransparency = isDropdown and .4 or .05}):Play()
+                    if tab.UIElements.TabIcon then
+                        Tween(tab.UIElements.TabIcon.ImageLabel, 0.1, {ImageTransparency = isDropdown and .2 or 0}):Play()
+                    end
+                end
+            end
+        end
+    end
+    
     local function Callback(customCallback)
         DropdownModule:Display()
         if Dropdown.Callback then
@@ -565,7 +611,8 @@ function DropdownMenu.New(Config, Dropdown, Element, CanCallback, Type)
             end
         end
         
-        -- Update display after refresh
+        -- Update selection state and display after refresh
+        DropdownModule:UpdateSelection()
         DropdownModule:Display()
         
         -- Recalculate sizes again after display update
