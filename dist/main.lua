@@ -4,7 +4,7 @@
     | |/ |/ / / _ \/ _  / /_/ // /  
     |__/|__/_/_//_/\_,_/\____/___/
     
-    v1.6.64  |  2026-01-13  |  Roblox UI Library for scripts
+    v1.6.74  |  2026-01-13  |  Roblox UI Library for scripts
     
     To view the source code, see the `src/` folder on the official GitHub repository.
     
@@ -1731,7 +1731,7 @@ New=a.load'h'.New
 return[[
 {
     "name": "windui",
-    "version": "1.6.64",
+    "version": "1.6.74",
     "main": "./dist/main.lua",
     "repository": "https://github.com/Footagesus/WindUI",
     "discord": "https://discord.gg/ftgs-development-hub-1300692552005189632",
@@ -7202,8 +7202,6 @@ end
 
 an.Tabs[av]=ax
 
-ar:Display()
-
 if aq=="Dropdown"then
 aj.AddSignal(ax.UIElements.TabItem.MouseButton1Click,function()
 if ax.Locked then return end
@@ -7290,9 +7288,46 @@ end
 end
 
 an.UIElements.MenuCanvas.Size=UDim2.new(0,av+6+6+5+5+18+6+6,an.UIElements.MenuCanvas.Size.Y.Scale,an.UIElements.MenuCanvas.Size.Y.Offset)
-Callback()
 
 an.Values=au
+
+
+if not an.Multi then
+local aw=typeof(an.Value)=="table"and an.Value.Title or an.Value
+local ax=false
+for ay,az in ipairs(au)do
+local aA=typeof(az)=="table"and az.Title or az
+if aA==aw then
+ax=true
+break
+end
+end
+if not ax and aw then
+
+an.Value=nil
+end
+else
+
+if typeof(an.Value)=="table"then
+local aw={}
+for ax,ay in ipairs(an.Value)do
+local az=typeof(ay)=="table"and ay.Title or ay
+for aA,aB in ipairs(au)do
+local b=typeof(aB)=="table"and aB.Title or aB
+if b==az then
+table.insert(aw,ay)
+break
+end
+end
+end
+an.Value=aw
+end
+end
+
+
+ar:Display()
+
+Callback()
 end
 
 ar:Refresh(an.Values)
