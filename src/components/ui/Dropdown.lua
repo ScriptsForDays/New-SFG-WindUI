@@ -317,7 +317,13 @@ function DropdownMenu.New(Config, Dropdown, Element, CanCallback, Type)
             end
         end
         
-        for Index,Tab in next, Values do
+        -- Use ipairs for array iteration to ensure proper order
+        local valuesArray = Values
+        if typeof(Values) ~= "table" then
+            valuesArray = {}
+        end
+        
+        for Index, Tab in ipairs(valuesArray) do
             if (Tab.Type ~= "Divider") then
                 local TabMain = {
                     Name = typeof(Tab) == "table" and Tab.Title or Tab,
