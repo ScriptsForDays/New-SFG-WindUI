@@ -3573,65 +3573,6 @@ al,
 })
 })
 
-
-local an={
-TextLabel=al,
-IconLabelFrame=ak,
-}
-
-
-function am.Set(ao,ap)
-local aq=an.TextLabel
-local ar=an.IconLabelFrame
-
-if typeof(ap)~="table"then
-
-if typeof(ap)=="string"then
-aq.Text=ap
-return
-end
-warn"Label:Set() expects a table with Text or Icon properties, or a string for text"
-return
-end
-
-if ap.Text~=nil then
-aq.Text=ap.Text
-end
-
-if ap.Icon~=nil then
-
-if ar then
-ar:Destroy()
-ar=nil
-an.IconLabelFrame=nil
-end
-
-
-if ap.Icon~=""then
-ar=ac("ImageLabel",{
-Image=ab.Icon(ap.Icon)[1],
-ImageRectSize=ab.Icon(ap.Icon)[2].ImageRectSize,
-ImageRectOffset=ab.Icon(ap.Icon)[2].ImageRectPosition,
-Size=UDim2.new(0,21,0,21),
-BackgroundTransparency=1,
-ThemeTag={
-ImageColor3="Icon",
-}
-})
-
-
-aq.Size=UDim2.new(1,-29,1,0)
-
-
-ar.Parent=am.Frame.Frame
-an.IconLabelFrame=ar
-else
-
-aq.Size=UDim2.new(1,0,1,0)
-end
-end
-end
-
 return am
 end
 
