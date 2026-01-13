@@ -422,8 +422,6 @@ function DropdownMenu.New(Config, Dropdown, Element, CanCallback, Type)
                 
                 Dropdown.Tabs[Index] = TabMain
                 
-                DropdownModule:Display()
-                
                 if Type == "Dropdown" then
                     Creator.AddSignal(TabMain.UIElements.TabItem.MouseButton1Click, function()
                         if TabMain.Locked then return end 
@@ -510,9 +508,46 @@ function DropdownMenu.New(Config, Dropdown, Element, CanCallback, Type)
         end
         
         Dropdown.UIElements.MenuCanvas.Size = UDim2.new(0, maxWidth + 6 + 6 + 5 + 5 + 18 + 6 + 6, Dropdown.UIElements.MenuCanvas.Size.Y.Scale, Dropdown.UIElements.MenuCanvas.Size.Y.Offset)
-        Callback()
         
         Dropdown.Values = Values
+        
+        -- Validate current value exists in new values, reset if not
+        if not Dropdown.Multi then
+            local currentValueStr = typeof(Dropdown.Value) == "table" and Dropdown.Value.Title or Dropdown.Value
+            local valueExists = false
+            for _, value in ipairs(Values) do
+                local valueStr = typeof(value) == "table" and value.Title or value
+                if valueStr == currentValueStr then
+                    valueExists = true
+                    break
+                end
+            end
+            if not valueExists and currentValueStr then
+                -- Current value doesn't exist in new values, reset to first value or nil
+                Dropdown.Value = nil
+            end
+        else
+            -- For multi dropdown, filter out values that don't exist in new values
+            if typeof(Dropdown.Value) == "table" then
+                local validValues = {}
+                for _, selectedValue in ipairs(Dropdown.Value) do
+                    local selectedStr = typeof(selectedValue) == "table" and selectedValue.Title or selectedValue
+                    for _, value in ipairs(Values) do
+                        local valueStr = typeof(value) == "table" and value.Title or value
+                        if valueStr == selectedStr then
+                            table.insert(validValues, selectedValue)
+                            break
+                        end
+                    end
+                end
+                Dropdown.Value = validValues
+            end
+        end
+        
+        -- Update display after refresh
+        DropdownModule:Display()
+        
+        Callback()
     end
       
     DropdownModule:Refresh(Dropdown.Values)
