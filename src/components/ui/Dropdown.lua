@@ -333,7 +333,10 @@ function DropdownMenu.New(Config, Dropdown, Element, CanCallback, Type)
         -- Ensure ScrollingFrame is visible
         Dropdown.UIElements.Menu.Frame.ScrollingFrame.Visible = true
         
+        -- Iterate through values - use ipairs for arrays, but handle edge cases
+        local tabCount = 0
         for Index, Tab in ipairs(valuesArray) do
+            tabCount = tabCount + 1
             -- Check if Tab is a divider (only tables can have Type property)
             local isDivider = typeof(Tab) == "table" and Tab.Type == "Divider"
             
@@ -575,6 +578,11 @@ function DropdownMenu.New(Config, Dropdown, Element, CanCallback, Type)
                     end)
                 end
             end
+        end
+        
+        -- Ensure at least some tabs were created
+        if tabCount == 0 and typeof(Values) == "table" then
+            warn("Dropdown:Refresh() - No tabs created from Values table. Values count: " .. tostring(#Values) .. ", type: " .. typeof(Values))
         end
         
         -- Recalculate sizes after all items are added
