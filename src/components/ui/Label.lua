@@ -93,14 +93,16 @@ function Label.New(Text, Icon, Parent, IsPlaceholder, Radius)
         })
     })
     
-    -- Store references for Set method
-    LabelFrame._TextLabel = TextLabel
-    LabelFrame._IconLabelFrame = IconLabelFrame
+    -- Store references in closure (Roblox instances don't support arbitrary properties)
+    local labelData = {
+        TextLabel = TextLabel,
+        IconLabelFrame = IconLabelFrame,
+    }
     
     -- Add Set method for dynamic updates
     function LabelFrame:Set(options)
-        local textLabel = self._TextLabel
-        local iconLabelFrame = self._IconLabelFrame
+        local textLabel = labelData.TextLabel
+        local iconLabelFrame = labelData.IconLabelFrame
         
         if typeof(options) ~= "table" then
             -- If options is a string, treat it as text
@@ -121,7 +123,7 @@ function Label.New(Text, Icon, Parent, IsPlaceholder, Radius)
             if iconLabelFrame then
                 iconLabelFrame:Destroy()
                 iconLabelFrame = nil
-                self._IconLabelFrame = nil
+                labelData.IconLabelFrame = nil
             end
             
             -- Create new icon if provided
@@ -140,9 +142,9 @@ function Label.New(Text, Icon, Parent, IsPlaceholder, Radius)
                 -- Update TextLabel size to account for icon
                 textLabel.Size = UDim2.new(1, -29, 1, 0)
                 
-                -- Insert icon into the frame
-                iconLabelFrame.Parent = self.Frame.Frame
-                self._IconLabelFrame = iconLabelFrame
+                -- Insert icon into the frame (before TextLabel)
+                iconLabelFrame.Parent = LabelFrame.Frame.Frame
+                labelData.IconLabelFrame = iconLabelFrame
             else
                 -- No icon, update TextLabel size
                 textLabel.Size = UDim2.new(1, 0, 1, 0)
